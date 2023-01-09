@@ -13,13 +13,17 @@ public class Movement : MonoBehaviour
     private GameObject target;
     private List<Bullet> bullets;
     public static Vector3 movement_vector;
+    public static Vector3 position_vector;
     private Vector3 start_vector;
     private Vector3 end_vector;
     private Vector3 viewport;
     private Bounds bounds;
+    int bullet_lim = 4;
+
+
     // Start is called before the first frame updates
 
-
+    
     void Start()
     {
         this.obj = GameObject.Find("Player");
@@ -29,10 +33,14 @@ public class Movement : MonoBehaviour
         this.line = this.obj.GetComponent(typeof (LineRenderer)) as LineRenderer;
         this.bullets = new List<Bullet>();
         cam = Camera.main;
+        Movement.position_vector = this.obj.transform.position;
+
+
+
 
         // this.viewport = cam.ViewportToWorldPoint(new Vector3(0, 0, cam.nearClipPlane));
         //this.bounds = new Bounds(new Vector3(0, 0, 0), this.viewport);
-        this.bounds = new Bounds(new Vector3(0, 0, 0), new Vector3(10, 10, 10));
+        this.bounds = new Bounds(new Vector3(0, 0, 0), new Vector3(20, 10, 10));
         Cursor.visible = false;
     }
 
@@ -47,9 +55,9 @@ public class Movement : MonoBehaviour
 
     private void shoot()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && bullets.Count <= this.bullet_lim)
         {
-            Vector3 movement_vector = this.end_vector - this.start_vector;
+            Vector3 movement_vector = (this.end_vector - this.start_vector).normalized;
 
 
             this.bullets.Add(new Bullet(this.obj.transform.position, movement_vector));
@@ -83,7 +91,6 @@ public class Movement : MonoBehaviour
                 bullet.move();
             }
             
-            bullet.move();
         }
 
         foreach (int index in indices)
@@ -144,6 +151,7 @@ private void move()
             //this.obj.transform.Translate(new Vector3(movement_coef, 0, 0));
         }
         obj.transform.Translate(movement_vector);
+        Movement.position_vector = obj.transform.position;
         obj.transform.Rotate(rotation);
 
     }
@@ -158,8 +166,7 @@ private void move()
         draw_line();
         shoot();
         update_bullets();
-        check_bounds();
-        Debug.Log(this.viewport);
-        Debug.Log(this.obj.transform.position);
+
+
     }
 }
